@@ -1,0 +1,33 @@
+<div style="width: 100%;">
+
+    <div style="width:40%;float: left;">
+        <h4 style="text-align:center">Pie Chart For Hashtags</h4>
+        <div style="display: block;">
+            <canvas [colors]="chartColors" baseChart [data]="hashTagData.data" [colors]="" [labels]="hashTagData.Labels"
+                [chartType]="pieChartType"></canvas>
+        </div>
+    </div>
+
+    <div style="width:40%;float: right;">
+        <h4 style="text-align:center">Pie Chart For Mentions</h4>
+
+        <div style="display: block; ">
+            <canvas [colors]="chartColors" baseChart [data]="mentionData.data" [labels]="mentionData.Labels"
+                [chartType]="pieChartType"></canvas>
+        </div>
+    </div>
+
+</div>
+
+<div style="width: 100%;">
+
+    <div style="clear: both;">
+        <h4 style="text-align:center">Chart For Covid tags</h4>
+
+        <div style="display: block; width: 50%; height: 50%;">
+            <canvas [colors]="chartColors" baseChart [data]="covidTweetsDateData.data"
+                [labels]="covidTweetsDateData.Labels" [chartType]="horizontalBarChartType"></canvas>
+        </div>
+    </div>
+
+</div>

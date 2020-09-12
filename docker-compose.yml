@@ -1,0 +1,39 @@
+version: "2.4"
+
+services:
+    redis:
+        image: redis:6.0.8
+        command: redis-server --appendonly yes
+        container_name: redis-kaggle-covid-test1
+        volumes:
+            - "redis-data:/data"
+        networks:
+            - kaggle-test-covid-net
+
+    mongo:
+        image: mongo:4.2.3-bionic
+        container_name: mongo-kaggle-covid-test1
+        volumes:
+            - "mongoDb_data:/data/db:rw"
+        networks:
+            - kaggle-test-covid-net
+
+    api:
+        container_name: api-kaggle-covid-test1
+        build: 
+            context: .
+            dockerfile: ./Dockerfile
+        depends_on: 
+            - redis
+            - mongo
+        ports: 
+            - "22344:22344"
+        networks:
+            - kaggle-test-covid-net
+
+volumes: 
+    redis-data:
+    mongoDb_data:
+
+networks: 
+    kaggle-test-covid-net:
