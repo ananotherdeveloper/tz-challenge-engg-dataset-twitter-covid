@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 
 
 export type APIResult = { key: string, count: number };
@@ -9,6 +9,10 @@ export type APIResult = { key: string, count: number };
     templateUrl: './piechart.html'
 })
 export class PieChartComponent implements OnInit {
+
+    @Input() isRedis: boolean;
+    private dataSource: string;
+
     // Pie
     public pieChartType: string = 'pie';
     public horizontalBarChartType: string = "line";
@@ -22,7 +26,8 @@ export class PieChartComponent implements OnInit {
         {
             backgroundColor: [
                 'rgba(255,0,0,0.3)', 'rgba(0,255,0,0.3)', 'rgba(0,0,255,0.3)',
-                'rgba(255, 233, 71, 0.5)', 'rgba(8, 233, 71, 0.5)', 'rgba(155, 121, 151, 0.6)', 'rgba(255,0,255,0.3)'
+                'rgba(255, 233, 71, 0.5)', 'rgba(8, 233, 71, 0.5)', 'rgba(155, 121, 151, 0.6)', 'rgba(255,0,255,0.3)',
+                'rgb(255, 247, 243,0.3)'
             ]
         },
     ];
@@ -30,9 +35,15 @@ export class PieChartComponent implements OnInit {
     constructor(private httpClient: HttpClient) { }
 
     async ngOnInit() {
-        const hashTagData = await this.httpClient.get<APIResult[]>("http://localhost:22344/hashtags").toPromise();
-        const mentionData = await this.httpClient.get<APIResult[]>("http://localhost:22344/mentions").toPromise();
-        const covidStatData = await this.httpClient.get<APIResult[]>("http://localhost:22344/covid/tweet-stats").toPromise();
+        if (this.isRedis) {
+            this.dataSource = "redis";
+        } else {
+            this.dataSource = "postgres";
+        }
+
+        const hashTagData = await this.httpClient.get<APIResult[]>(`http://localhost:22344/${this.dataSource}/hashtags`).toPromise();
+        const mentionData = await this.httpClient.get<APIResult[]>(`http://localhost:22344/${this.dataSource}/mentions`).toPromise();
+        const covidStatData = await this.httpClient.get<APIResult[]>(`http://localhost:22344/${this.dataSource}/covid/tweet-stats`).toPromise();
 
         this.hashTagData.Labels = hashTagData.map(x => x.key);
         this.hashTagData.data = hashTagData.map(x => Number(x.count));

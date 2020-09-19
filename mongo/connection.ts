@@ -19,6 +19,8 @@ export class MongoConnection {
             dbName: "kaggletweet"
         });
 
+        console.log("Mongo connected sucessfully");
+
         return this.dbConnection;
     }
 

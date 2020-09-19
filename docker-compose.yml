@@ -26,8 +26,18 @@ services:
         depends_on: 
             - redis
             - mongo
+            - postgres
         ports: 
             - "22344:22344"
+        networks:
+            - kaggle-test-covid-net
+
+    postgres:
+        image: postgres
+        container_name: postgres-kaggle-test
+        environment: 
+            - POSTGRES_PASSWORD=pass123
+            - POSTGRES_DB=testdb
         networks:
             - kaggle-test-covid-net
 

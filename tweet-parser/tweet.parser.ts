@@ -4,8 +4,13 @@ import { RedisCache } from '../cache/redis';
 import { Query } from 'mongoose';
 import { SortedSetKeys, SortedSetCountAllHashes } from '../constants';
 import { MongoModels } from '../mongo/models';
+import { v4 } from "uuid";
+import { PGTweetHashTag, PGTweetMention, PGTweetSchema } from '../postgres/schema';
+import { PgRepository } from '../postgres/pg.repository';
 
 export async function parseIncomingTweet(data: CSVStructure) {
+
+    const pgRepo = new PgRepository();
 
     data = parseHashtags(data);
     const mentions = extractMentionsFromTweet(data.text);
@@ -26,12 +31,12 @@ export async function parseIncomingTweet(data: CSVStructure) {
 
     // Tweet Model
     const tweet: TweetSchema = {
-        date: tweetDate,
-        is_retweet: data.is_retweet.toLowerCase() === "false" ? false : true,
-        source: data.source,
-        text: data.text,
-        user_location: data.user_location,
         user_name: data.user_name,
+        user_location: data.user_location,
+        date: tweetDate,
+        text: data.text,
+        source: data.source,
+        is_retweet: data.is_retweet.toLowerCase() === "false" ? false : true,
         hashtags: hashtags,
         mentions: mentions
     };
@@ -69,10 +74,11 @@ export async function parseIncomingTweet(data: CSVStructure) {
 
         // Count COVID hash-tagged tweets by date distribution.
         promises.push(
-            RedisCache.incrementSSetCount(SortedSetKeys.CovidTweetDistribution, `${tweetDate.getFullYear()}_${tweetDate.getMonth()}_${tweetDate.getDate()}`)
+            RedisCache.incrementSSetCount(SortedSetKeys.CovidTweetDistribution, `${tweetDate.getFullYear()}_${tweetDate.getMonth() + 1}_${tweetDate.getDate()}`)
         );
-
     });
+
+    handlePostgresInsertions(promises, tweet, pgRepo);
 
     try {
         await Promise.all(promises);
@@ -124,4 +130,20 @@ function parseHashtags(data: CSVStructure) {
     }
 
     return data;
+}
+
+function handlePostgresInsertions(promises: any[], tweet: TweetSchema, repo: PgRepository) {
+    const id = v4();
+
+    const tweets: PGTweetSchema = { id, ...tweet } as any;
+    const tweetHashtags: PGTweetHashTag[] = (tweet.hashtags || []).map(x => ({ tweetId: id, hashtag: x })) || [];
+    const tweetMentions: PGTweetMention[] = (tweet.mentions || []).map(x => ({ tweetId: id, mention: x })) || [];
+
+    delete (tweets as any).hashtags;
+    delete (tweets as any).mentions;
+
+    promises.push(repo.insertTweet(tweets));
+
+    tweetHashtags.forEach(ht => promises.push(repo.insertTweetHashtag(ht)));
+    tweetMentions.forEach(m => promises.push(repo.insertTweetMention(m)));
 }

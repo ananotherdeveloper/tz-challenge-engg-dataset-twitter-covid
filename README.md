@@ -6,6 +6,7 @@
 - Node.Js
 - Redis   - for caching view data
 - MongoDb - for persistence
+- Postgres - For Materialized views
 - Angular 10
 
 > Pre-Requisite - You need docker to run it seamlessly.
@@ -30,6 +31,13 @@ It generally takes around 3-4 minutes to import the CSV into MongoDb [and Redis 
 
 
 #### API endpoints Exposed:
-- GET [http://localhost:22344/hashtags] This endpoint fetches the TOP 5 hashtags.
-- GET [http://localhost:22344/mentions] This endpoint retrieves the Top 5 usernames mentioned in tweets
-- GET [http://localhost:22344/covid/tweet-stats] This endpoint retrieves the data for the Tweets that had hashtag matching to "covid".
+
+### REDIS Endpoints
+- GET [http://localhost:22344/redis/hashtags] This endpoint fetches the TOP 5 hashtags.
+- GET [http://localhost:22344/redis/mentions] This endpoint retrieves the Top 5 usernames mentioned in tweets
+- GET [http://localhost:22344/redis/covid/tweet-stats] This endpoint retrieves the data for the Tweets that had hashtag matching to "covid".
+
+### PostGres Endpoints
+- GET [http://localhost:22344/postgres/hashtags] This endpoint fetches the TOP 5 hashtags.
+- GET [http://localhost:22344/postgres/mentions] This endpoint retrieves the Top 5 usernames mentioned in tweets
+- GET [http://localhost:22344/postgres/covid/tweet-stats] This endpoint retrieves the data for the Tweets that had hashtag matching to "covid".

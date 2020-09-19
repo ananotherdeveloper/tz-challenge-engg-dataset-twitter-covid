@@ -15,3 +15,5 @@ export enum MongoCollections {
 }
 
 export type RedisSortedSetResult = { key: string, count: number };
+
+export type PostgresResult = RedisSortedSetResult;

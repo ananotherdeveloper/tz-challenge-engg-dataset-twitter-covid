@@ -36,8 +36,6 @@ export class RedisCache {
         return RedisCache.parseSortedSetResult(data);
     });
 
-
-
     private static parseSortedSetResult(data: string[]): RedisSortedSetResult[] {
 
         // data will always be an even length result array.
